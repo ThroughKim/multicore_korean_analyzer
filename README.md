@@ -18,3 +18,5 @@ $ python multicore_analyzer.py
 ...
 폴더이름을 입력하세요: your_folder_name
 ```
+
+multicore_analyzer.py 파일 내의 exception_list와 tag_list 그리고 멀티코어 Pool의 갯수를 자신에 맞도록 커스터마이징 해 사용하면 됩니다.
