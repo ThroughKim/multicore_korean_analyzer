@@ -14,6 +14,7 @@ def parse(file):
     sentences = kkma.sentences(file_text)
 
     for sentence in sentences:
+        sentense_list = []
         morphemes = kkma.pos(sentence)
         for word_set in morphemes:
             word = word_set[0]
@@ -22,7 +23,8 @@ def parse(file):
                 if word not in exception_list:
                     if type == 'VV' or type == 'VA':
                         word += '다'
-                    result_list.append(word)
+                    sentense_list.append(word)
+        result_list.append(sentense_list)
 
     return result_list
 
@@ -59,14 +61,13 @@ if __name__ == "__main__":
     pools.close()
     pools.join()
 
-    word_list = combine_lists(results)
-
-    top_words = sorted(dict(Counter(word_list).most_common(word_count)).items(), key=operator.itemgetter(1))
+    word_lists = combine_lists(results)
 
     f = open(folder_name + "_output", 'w')
-    for word in reversed(top_words):
-        data = word[0] + " " + str(word[1])
-        f.write(data + "\n")
+    for word_list in word_lists:
+        for word in word_list:
+            f.write(word + " ")
+        f.write("\n")
     f.close
 
     end_time = time.time()
