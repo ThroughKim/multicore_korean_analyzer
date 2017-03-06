@@ -16,11 +16,11 @@ def parse(file):
     for sentence in sentences:
         morphemes = kkma.pos(sentence)
         for word_set in morphemes:
-            print(word_set)
             word = word_set[0]
             type = word_set[1]
             if type in tag_list:
-                if word not in exception_list:
+                if word in word_list:
+
                     if type == 'VV' or type == 'VA':
                         word += '다'
                     result_list.append(word)
@@ -33,6 +33,11 @@ def combine_lists(lists):
     for list in lists:
         combined_list.extend(list)
 
+    combined_list = [word.replace('안','알다') for word in combined_list]
+    combined_list = [word.replace('점수','성적') for word in combined_list]
+    combined_list = [word.replace('방법','방식') for word in combined_list]
+    combined_list = [word.replace('열정적','열정') for word in combined_list]
+    combined_list = [word.replace('교수','선생님') for word in combined_list]
     return combined_list
 
 def make_log_result(results, len_file_list):
@@ -47,12 +52,12 @@ if __name__ == "__main__":
     print("분석할 폴더의 이름을 입력하세요.")
     print("현재 파일에 대한 상대경로만 입력하면 되며, 끝에 '/'는 생략해주세요.")
     folder_name = input("폴더이름을 입력하세요:  ")
-    word_count = 200
-    exception_list = ["교수님", "수업", "학생", "강의", "학기", "점", "때", "시간", "중간", "기말", "고사", "생각", "시간", "동안","있","하","같","되"]
+    word_count = 100
+    word_list = ["좋", "대하", "많", "없", "듣", "내용", "잘", "이해", "배우", "설명", "감사", "발표", "시험", "알", "도움", "과제", "어렵", "쉽", "토론", "문제", "통하", "공부", "준비", "힘들", "재미있", "가르치", "사람", "방식", "방법", "질문", "다양", "아쉽", "자료", "열심히", "평가", "지식", "흥미", "친절", "안", "아니", "재밌", "참여", "노력", "이야기", "인상깊", "필요", "개선", "이론", "성적", "점수", "유익", "말씀", "부족", "열정적", "열정", "부담", "능력", "의견", "피드백", "소통", "분위기", "관심", "실습", "기준", "즐겁", "진도", "출석", "항상", "선생님",  "교수", "못"]
     tag_list = ['NNG', 'NNP', 'VV', 'VA', 'MAG']
     file_list = os.listdir(folder_name + '/')
 
-    pools = Pool(7)
+    pools = Pool(3)
     results = []
 
     for file in file_list:
