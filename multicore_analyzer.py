@@ -16,6 +16,7 @@ def parse(file):
     for sentence in sentences:
         morphemes = kkma.pos(sentence)
         for word_set in morphemes:
+            print(word_set)
             word = word_set[0]
             type = word_set[1]
             if type in tag_list:
@@ -49,7 +50,7 @@ if __name__ == "__main__":
     tag_list = ['NNG', 'NNP']
     file_list = os.listdir(folder_name + '/')
 
-    pools = Pool(3)
+    pools = Pool(7)
     results = []
 
     for file in file_list:
