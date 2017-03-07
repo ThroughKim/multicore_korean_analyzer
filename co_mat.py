@@ -1,18 +1,20 @@
-from itertools import combinations_with_replacement
 
-L1 = ['b', 'c', 'd', 'e', 't', 'w', 'x', 'y', 'z']
-L2 = ['the onion', 'be your self', 'great zoo', 'x men', 'corn day']
+from collections import defaultdict
 
-phrase_map = {}
+L1 = ['be', 'your']
+L2 = ['the onion', 'be your self', 'great zoo', 'x men', 'corn day', 'yes be your self']
 
-for phrase in L2:
-    word_count = {word: phrase.count(word) for word in L1 if word in phrase}
+d = dict.fromkeys(L2)
 
-    occurrence_map = {}
-    for x, y in combinations_with_replacement(word_count, 2):
-        occurrence_map[(x,y)] = occurrence_map[(y,x)] = \
-            word_count[x] * word_count[y]
+for s, phrase in enumerate(L2):
+    d[phrase] = defaultdict(int)
+    for word1 in phrase.split(" "):
+        for word2 in phrase.split(" "):
+            if word1 in L1 and word2 in L1:
+                output = word1, word2, phrase
+                print(output)
+                key = (word1, word2)
+                d[phrase][key] += 1
 
-    phrase_map[phrase] = occurrence_map
-
-print phrase_map
+print(d)
+print(d['be your self'])
