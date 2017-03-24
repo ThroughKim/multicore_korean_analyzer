@@ -31,7 +31,7 @@ def parse(file):
 def combine_lists(lists):
     replace_list = dict(
         많이='많다',
-        알다='배우',
+        알다='배우다',
         중간='시험',
         기말='시험',
         중간고사='시험',
@@ -56,7 +56,6 @@ def combine_lists(lists):
         강의='수업',
         학생='사람',
         알='배우다',
-        배우='배우다'
     )
     combined_list = []
     for list in lists:
