@@ -70,7 +70,7 @@ if __name__ == "__main__":
 
     top_words = sorted(dict(Counter(word_list).most_common(word_count)).items(), key=operator.itemgetter(1))
 
-    f = open(folder_name + "_topword_output", 'w')
+    f = open(folder_name + "_lowword_output", 'w')
     for word in reversed(top_words):
         data = word[0] + " " + str(word[1])
         f.write(data + "\n")
