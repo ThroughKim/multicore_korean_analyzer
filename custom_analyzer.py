@@ -29,15 +29,38 @@ def parse(file):
 
 
 def combine_lists(lists):
+    replace_list = dict(
+        많이='많다',
+        알다='배우',
+        중간='시험',
+        기말='시험',
+        중간고사='시험',
+        기말고사='시험',
+        고사='시험',
+        부담='어렵다',
+        소통='통하다',
+        대화='통하다',
+        흥미='재미있다',
+        재밌다='재미있다',
+        즐겁다='재미있다',
+        노력='열심히',
+        열정적='열심히',
+        열정='열심히',
+        관심='친절',
+        배려='친절',
+        인상='인상깊다',
+        점수='성적',
+        실력='능력',
+        교수='선생님',
+        교수님='선생님',
+        강의='수업'
+    )
     combined_list = []
     for list in lists:
         combined_list.extend(list)
 
-    combined_list = [word.replace('안','알다') for word in combined_list]
-    combined_list = [word.replace('점수','성적') for word in combined_list]
-    combined_list = [word.replace('방법','방식') for word in combined_list]
-    combined_list = [word.replace('열정적','열정') for word in combined_list]
-    combined_list = [word.replace('교수','선생님') for word in combined_list]
+    combined_list = [str(replace_list.get(word, word)) for word in combined_list]
+
     return combined_list
 
 def make_log_result(results, len_file_list):
@@ -53,7 +76,7 @@ if __name__ == "__main__":
     print("현재 파일에 대한 상대경로만 입력하면 되며, 끝에 '/'는 생략해주세요.")
     folder_name = input("폴더이름을 입력하세요:  ")
     word_count = 100
-    word_list = ["좋", "대하", "많", "없", "듣", "내용", "잘", "이해", "배우", "설명", "감사", "발표", "시험", "알", "도움", "과제", "어렵", "쉽", "토론", "문제", "통하", "공부", "준비", "힘들", "재미있", "가르치", "사람", "방식", "방법", "질문", "다양", "아쉽", "자료", "열심히", "평가", "지식", "흥미", "친절", "안", "아니", "재밌", "참여", "노력", "이야기", "인상깊", "필요", "개선", "이론", "성적", "점수", "유익", "말씀", "부족", "열정적", "열정", "부담", "능력", "의견", "피드백", "소통", "분위기", "관심", "실습", "기준", "즐겁", "진도", "출석", "항상", "선생님",  "교수", "못"]
+    word_list = ['많', '많이', '없', '내용', '이해', '배우', '알', '설명', '감사', '발표', '시험', '중간', '기말', '중간고사', '기말고사', '고사', '도움', '과제', '어렵', '부담', '쉽', '토론', '문제', '통하', '소통', '대화', '준비', '재미있', '재밌', '흥미', '즐겁', '사람', '학생', '질문', '아쉽', '열심히', '노력', '열정적', '열정', '평가', '지식', '친절', '관심', '배려', '이야기', '인상깊', '인상', '성적', '점수', '유익', '능력', '실력', '피드백', '선생님', '교수', '교수님', '수업', '강의']
     tag_list = ['NNG', 'NNP', 'VV', 'VA', 'MAG']
     file_list = os.listdir(folder_name + '/')
 
