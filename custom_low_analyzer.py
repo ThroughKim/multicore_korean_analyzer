@@ -31,7 +31,7 @@ def parse(file):
 def combine_lists(lists):
     replace_list = dict(
         별로='전혀',
-        늦디='지각'
+        늦다='지각'
     )
     combined_list = []
     for list in lists:

@@ -56,6 +56,7 @@ def combine_lists(lists):
         강의='수업',
         학생='사람',
         알='배우다',
+        배우='배우다'
     )
     combined_list = []
     for list in lists:
