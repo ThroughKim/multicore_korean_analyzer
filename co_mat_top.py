@@ -27,8 +27,9 @@ def parse(file):
                 if word in word_list:
                     if type == 'VV' or type == 'VA':
                         word += '다'
+                    word = replace_list.get(word, word)
                     sentence_word_list.append(word)
-        sentence_word_list = [replace_list.get(word, word) for word in sentence_word_list]
+
         result_list.append(sentence_word_list)
 
     return result_list
@@ -78,6 +79,7 @@ if __name__ == "__main__":
     tag_list = ['NNG', 'NNP', 'VV', 'VA', 'MAG']
     replace_list = dict(
         많이='많다',
+        베우='배우다',
         알다='배우다',
         중간='시험',
         기말='시험',
@@ -106,7 +108,6 @@ if __name__ == "__main__":
         알='배우다',
         완벽='최고',
         글쓰기='글',
-        베우='배우다',
     )
     file_list = os.listdir(folder_name + '/')
 
