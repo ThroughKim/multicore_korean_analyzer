@@ -45,7 +45,8 @@ replace_list = dict(
         학생='사람',
         알='배우다',
         별로='전혀',
-        늦디='지각'
+        늦디='지각',
+        베우='배우다',
     )
 
 res = {}
@@ -76,7 +77,6 @@ G = nx.Graph()
 for item in res:
     G.add_edge(item[0], item[1], weight=res[item])
 
-nx.write_graphml(G, './ graphfile.graphml')
 
 weights= [G[u][v]['weight'] * 0.01 for u,v in G.edges()]
 degree = nx.degree(G)
