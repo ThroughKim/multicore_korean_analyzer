@@ -50,25 +50,15 @@ def make_graphml(lists):
     for sentence_list in combined_list:
         for word1 in sentence_list:
             for word2 in sentence_list:
-                print(word1, word2)
-                
-        # for word1 in sentece.split(" "):
-        #     word1 = replace_list.get(word1, word1)
-        #
-        #     for word2 in sentece.split(" "):
-        #         word2 = replace_list.get(word2, word2)
-        #
-        #         if word1 in word_list and word2 in word_list:
-        #             output = word1, word2, sentece
-        #             key = (word1, word2)
-        #             res[key] = res.get(key, 0) + 1
+                key = (word1, word2)
+                res[key] = res.get(key, 0) + 1
 
-    # res = {k: v for k, v in res.items() if v > 1}
-
+    res = {k: v for k, v in res.items() if v > 5}
     G = nx.Graph()
-
     for item in res:
         G.add_edge(item[0], item[1], weight=res[item])
+
+    return G
 
 
 if __name__ == "__main__":
@@ -128,10 +118,8 @@ if __name__ == "__main__":
     pools.close()
     pools.join()
 
-    make_graphml(results)
-
-    # graphml = make_graphml(results)
-    # nx.write_graphml(G, './top.graphml')
+    graph = make_graphml(results)
+    nx.write_graphml(graph, './top.graphml')
 
     end_time = time.time()
     print("완료   ")
