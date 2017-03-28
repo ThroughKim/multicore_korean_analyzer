@@ -30,7 +30,6 @@
     <node id="지식" />
     <node id="유익" />
     <node id="기억" />
-    <node id="배우" />
     <node id="어렵다" />
     <node id="아쉽다" />
     <node id="준비" />

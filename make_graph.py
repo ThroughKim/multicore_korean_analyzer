@@ -16,7 +16,7 @@ nx.draw_random(
     node_color = 'yellow',
     edge_color = 'gray',
     width = weights,
-    node_size = [v*v*3 for v in degree.values()]
+    node_size = [v*v*1.5 for v in degree.values()]
 )
 end_time = time.time()
 
