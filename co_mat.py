@@ -108,7 +108,7 @@ if __name__ == "__main__":
     )
     file_list = os.listdir(folder_name + '/')
 
-    pools = Pool(6)
+    pools = Pool(3)
     results = []
 
     for file in file_list:
