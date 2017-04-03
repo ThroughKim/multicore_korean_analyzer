@@ -3,11 +3,11 @@ import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
 import time
 
-G = nx.read_graphml('./low.graphml')
+G = nx.read_graphml('./top.graphml')
 fp1 = fm.FontProperties(fname="./NotoSansCJKkr-Regular.otf", size=8)
 nx.set_fontproperties(fp1)
 
-weights= [G[u][v]['weight'] * 0.0015 for u,v in G.edges()]
+weights= [G[u][v]['weight'] * 0.055 for u,v in G.edges()]
 degree = nx.degree(G)
 
 nx.draw_random(
@@ -16,7 +16,7 @@ nx.draw_random(
     node_color = 'yellow',
     edge_color = 'gray',
     width = weights,
-    node_size = [v*50 for v in degree.values()]
+    node_size = [v*v*7 for v in degree.values()]
 )
 end_time = time.time()
 
