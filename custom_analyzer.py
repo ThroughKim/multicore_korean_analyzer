@@ -29,6 +29,39 @@ def parse(file):
 
 
 def combine_lists(lists):
+    replace_list = get_replace_list()
+
+    combined_list = []
+    for list in lists:
+        combined_list.extend(list)
+
+    combined_list = [str(replace_list.get(word, word)) for word in combined_list]
+
+    return combined_list
+
+def make_log_result(results, len_file_list):
+    def log_result(retval):
+        results.append(retval)
+        sys.stdout.write(" " + str(round(len(results)/len_file_list*100, 2)) + '% \r')
+
+    return log_result
+
+def get_word_list():
+    word_list = [
+        '많', '많이', '없', '내용', '이해', '배우', '알', '설명', '감사', '발표', '시험', '중간', '기말', '중간고사', '기말고사', '고사',
+        '도움', '과제', '어렵', '부담', '쉽', '토론', '문제', '통하', '소통', '대화', '준비', '재미있', '재밌', '흥미', '즐겁', '사람',
+        '학생', '질문', '아쉽', '열심히', '노력', '열정적', '열정', '평가', '지식', '친절', '관심', '배려', '이야기', '인상깊', '인상',
+        '성적', '점수', '유익', '능력', '실력', '피드백', '선생님', '교수', '교수님', '수업', '강의'
+    ]
+
+    return word_list
+
+def get_tag_list():
+    tag_list = ['NNG', 'NNP', 'VV', 'VA', 'MAG']
+
+    return tag_list
+
+def get_replace_list():
     replace_list = dict(
         많이='많다',
         알다='배우다',
@@ -58,35 +91,20 @@ def combine_lists(lists):
         알='배우다',
         배우='배우다'
     )
-    combined_list = []
-    for list in lists:
-        combined_list.extend(list)
 
-    combined_list = [str(replace_list.get(word, word)) for word in combined_list]
-
-    return combined_list
-
-def make_log_result(results, len_file_list):
-    def log_result(retval):
-        results.append(retval)
-        sys.stdout.write(" " + str(round(len(results)/len_file_list*100, 2)) + '% \r')
-
-    return log_result
+    return replace_list
 
 if __name__ == "__main__":
     start_time = time.time()
     print("분석할 폴더의 이름을 입력하세요.")
     print("현재 파일에 대한 상대경로만 입력하면 되며, 끝에 '/'는 생략해주세요.")
     folder_name = input("폴더이름을 입력하세요:  ")
+
     word_count = 100
-    word_list = [
-        '많', '많이', '없', '내용', '이해', '배우', '알', '설명', '감사', '발표', '시험', '중간', '기말', '중간고사', '기말고사', '고사',
-        '도움', '과제', '어렵', '부담', '쉽', '토론', '문제', '통하', '소통', '대화', '준비', '재미있', '재밌', '흥미', '즐겁', '사람',
-        '학생', '질문', '아쉽', '열심히', '노력', '열정적', '열정', '평가', '지식', '친절', '관심', '배려', '이야기', '인상깊', '인상',
-        '성적', '점수', '유익', '능력', '실력', '피드백', '선생님', '교수', '교수님', '수업', '강의'
-    ]
-    tag_list = ['NNG', 'NNP', 'VV', 'VA', 'MAG']
+
     file_list = os.listdir(folder_name + '/')
+    word_list = get_word_list()
+    tag_list = get_tag_list()
 
     pools = Pool(3)
     results = []
