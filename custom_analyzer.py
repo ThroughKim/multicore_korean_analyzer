@@ -27,7 +27,6 @@ def parse(file):
 
     return result_list
 
-
 def combine_lists(lists):
     replace_list = get_replace_list()
 
