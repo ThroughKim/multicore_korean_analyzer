@@ -28,7 +28,7 @@ def parse(file):
     return result_list
 
 def combine_lists(lists):
-    replace_list = get_replace_list()
+    replace_list = get_replace_list(word_set_type)
 
     combined_list = []
     for list in lists:
