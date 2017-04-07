@@ -68,7 +68,7 @@ if __name__ == "__main__":
         for word in word_list:
             f.write(word + " ")
         f.write("\n")
-    f.close
+    f.close()
 
     end_time = time.time()
     print("완료   ")
