@@ -1,41 +1,38 @@
 from __future__ import division
-import time, os
 from multiprocessing import Pool
 from konlpy.tag import Kkma
+import networkx as nx
+import codecs
+import os
 import sys
+import time
 
 
 def parse(file):
     result_list = []
     kkma = Kkma()
-    file = open(folder_name + '/' + file)
-    file_text = file.read()
-    sentences = kkma.sentences(file_text)
 
-    for sentence in sentences:
+    text_file = codecs.open(folder_name + '/' + file, 'r', encoding='utf8')
+    file_sentence_list = text_file.readlines()
+
+    for sentence in file_sentence_list:
+        sentence_word_list = []
+
         morphemes = kkma.pos(sentence)
         for word_set in morphemes:
             word = word_set[0]
             type = word_set[1]
+
             if type in tag_list:
                 if word in word_list:
-
                     if type == 'VV' or type == 'VA':
                         word += '다'
-                    result_list.append(word)
+                    word = replace_list.get(word, word)
+                    sentence_word_list.append(word)
+
+        result_list.append(sentence_word_list)
 
     return result_list
-
-
-def combine_lists(lists):
-    replace_list = get_replace_list(word_set_type)
-    combined_list = []
-    for list in lists:
-        combined_list.extend(list)
-
-    combined_list = [str(replace_list.get(word, word)) for word in combined_list]
-
-    return combined_list
 
 def make_log_result(results, len_file_list):
     def log_result(retval):
@@ -43,6 +40,26 @@ def make_log_result(results, len_file_list):
         sys.stdout.write(" " + str(round(len(results)/len_file_list*100, 2)) + '% \r')
 
     return log_result
+
+def make_graphml(lists):
+    res = {}
+
+    combined_list = []
+    for list in lists:
+        combined_list.extend(list)
+
+    for sentence_list in combined_list:
+        for word1 in sentence_list:
+            for word2 in sentence_list:
+                key = (word1, word2)
+                res[key] = res.get(key, 0) + 1
+
+    res = {k: v for k, v in res.items() if v > 5}
+    G = nx.Graph()
+    for item in res:
+        G.add_edge(item[0], item[1], weight=res[item])
+
+    return G
 
 def get_word_list(type):
     word_list = []
@@ -198,6 +215,7 @@ if __name__ == "__main__":
     print("현재 파일에 대한 상대경로만 입력하면 되며, 끝에 '/'는 생략해주세요.")
     folder_name = input("폴더이름을 입력하세요:  ")
     file_list = os.listdir(folder_name + '/')
+    replace_list = get_replace_list(word_set_type)
 
     pools = Pool(3)
     results = []
@@ -207,13 +225,9 @@ if __name__ == "__main__":
     pools.close()
     pools.join()
 
-    word_list = combine_lists(results)
-
-    f = open(folder_name + "_output", 'w')
-    for word in word_list:
-        f.write(word + "\n")
-    f.close
+    graph = make_graphml(results)
+    nx.write_graphml(graph, './' + folder_name + '.graphml')
 
     end_time = time.time()
-    print("완료   출력파일 - " + folder_name + '_output')
+    print("완료   출력파일 - " + folder_name + '.graphml')
     print("걸린 시간" + str(end_time - start_time))
