@@ -1,3 +1,4 @@
+# 필요 패키지 설치 및 로드
 install.packages('tm')
 install.packages('stringr')
 install.packages('lda')
@@ -5,10 +6,8 @@ install.packages('topicmodels')
 install.packages('LDAvis')
 install.packages('servr')
 install.packages('LDAvisData')
-
 install.packages("devtools")
 devtools::install_github("cpsievert/LDAvisData")
-
 
 library(lda)
 library(stringr)
@@ -17,41 +16,24 @@ library(topicmodels)
 library(LDAvis)
 library(servr)
 library(LDAvisData)
-
-
 library(MASS)
-PimaCV.lda <- lda(type ~ ., data = Pima.tr, CV = TRUE)
-tab <- table(Pima.tr$type, PimaCV.lda$class)
-conCV1 <- rbind(tab[1, ]/sum(tab[1, ]), tab[2, ]/sum(tab[2, ]))
-dimnames(conCV1) <- list(Actual = c("No", "Yes"), "Predicted (cv)" = c("No", "Yes"))
-print(round(conCV1, 3))
 
-Pima.lda <- lda(type ~ ., data = Pima.tr)
-Pima.hat <- predict(Pima.lda)
-tabtrain <- table(Pima.tr$type, Pima.hat$class)
-
-
-text_data = readLines("total_lda_wordset", encoding="UTF-8") ## 텍스트 파일의 모든 행 읽어오기
-reviews<-text_data
-data<-reviews
-
-# read in some stopwords:
-library(tm)
-stop_words <- stopwords("SMART")
-
-doc.list <- strsplit(reviews, "[[:space:]]+") # 공백을 기준으로 문장 분리
+# lda_sentense_extractor.py의 결과 파일 로드
+text_data = readLines("test_lda_wordset", encoding="UTF-8")
+doc.list <- strsplit(text_data, "[[:space:]]+") # 공백을 기준으로 문장 분리
 doc.list <- doc.list[lengths(doc.list) >0]    # 빈 줄 삭제
 
-# compute the table of terms:
+# 빈도수 계산하여 테이블로 출력
 term.table <- table(unlist(doc.list))
 term.table <- sort(term.table, decreasing = TRUE)
 
-# remove terms that are stop words or occur fewer than 3 times:
+# 예외 단어 및 5회 미만 출현 단어 삭제
+stop_words <- stopwords("SMART")
 del <- names(term.table) %in% stop_words | term.table < 5
 term.table <- term.table[!del]
 vocab <- names(term.table)
 
-# now put the documents into the format required by the lda package:
+# LDA 패키지에 적합한 형태로 변형
 get.terms <- function(x) {
   index <- match(x, vocab)
   index <- index[!is.na(index)]
@@ -59,7 +41,7 @@ get.terms <- function(x) {
 }
 documents <- lapply(doc.list, get.terms)
 
-# Compute some statistics related to the data set:
+# 데이터 셋에 관련된 값 계산
 D <- length(documents)  # number of documents (2,000)
 W <- length(vocab)  # number of terms in the vocab (14,568)
 doc.length <- sapply(documents, function(x) sum(x[2, ]))  # number of tokens per document [312, 288, 170, 436, 291, ...]
@@ -75,18 +57,15 @@ eta <- 0.02
 # Fit the model:
 library(lda)
 set.seed(357)
-t1 <- Sys.time()
 fit <- lda.collapsed.gibbs.sampler(documents = documents, K = K, vocab = vocab,
                                    num.iterations = G, alpha = alpha,
                                    eta = eta, initial = NULL, burnin = 0,
                                    compute.log.likelihood = TRUE)
-t2 <- Sys.time()
-t2 - t1  # about 24 minutes on laptop
 
 theta <- t(apply(fit$document_sums + alpha, 2, function(x) x/sum(x)))
 phi <- t(apply(t(fit$topics) + eta, 2, function(x) x/sum(x)))
 
-MovieReviews <- list(phi = phi,
+Text_words <- list(phi = phi,
                      theta = theta,
                      doc.length = doc.length,
                      vocab = vocab,
@@ -94,11 +73,12 @@ MovieReviews <- list(phi = phi,
 
 options(encoding = 'UTF-8') #한글로 결과 보기
 
-# create the JSON object to feed the visualization:
-json <- createJSON(phi = MovieReviews$phi,
-                   theta = MovieReviews$theta,
-                   doc.length = MovieReviews$doc.length,
-                   vocab = MovieReviews$vocab,
-                   term.frequency = MovieReviews$term.frequency, encoding='UTF-8')
+# JSON 타입으로 저장 및 시각화
+json <- createJSON(phi = Text_words$phi,
+                   theta = Text_words$theta,
+                   doc.length = Text_words$doc.length,
+                   vocab = Text_words$vocab,
+                   term.frequency = Text_words$term.frequency, encoding='UTF-8')
 
-serVis(json, out.dir = 'total_LDA', open.browser = TRUE)
+# 시각화 된 파일 지정 폴더로 출력
+serVis(json, out.dir = 'test_LDA', open.browser = TRUE)
