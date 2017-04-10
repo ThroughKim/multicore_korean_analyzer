@@ -1,0 +1,17 @@
+텍스트 전처리
+    vi
+
+문서에서 상위 n개 단어 뽑기
+    multicore_analyzer.py > 엑셀
+
+문서에서 지정된 단어 빈도 뽑기
+    word_freq_extractor > 엑셀
+
+코매트릭스 네트워크 다이어그램 그리기
+    create_graphml.py > make_graph.py
+
+워드클라우드 그리기
+    cloud_word_extractor.py > create_wc.R
+
+lda 그래프 만들기
+    lda_sentense_extractor.py > lda_visual.R
