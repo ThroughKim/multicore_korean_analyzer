@@ -2,10 +2,12 @@
 # 가장 자주 등장하는 n개의 단어를 추출함
 
 from __future__ import division
-import time, os,  operator
 from multiprocessing import Pool
 from konlpy.tag import Kkma
 from collections import Counter
+import time
+import os
+import operator
 import sys
 
 # 파싱함수 - 문장에서 정해진 품사 단어를 추출함
@@ -14,9 +16,9 @@ def parse(file):
     kkma = Kkma()                               # Konlpy의 꼬꼬마 형태소 분석기 사용
     file = open(folder_name + '/' + file)       # 인자로 받은 파일명의 파일 열기
     file_text = file.read()                     # 파일 내 텍스트 읽어옴
-    sentences = kkma.sentences(file_text)       # 형태소 분석기로 문장을 리스트로 추출
+    sentences = kkma.sentences(file_text)       # 형태소 분석기로 텍스트의 각 Row의 문장을 리스트로 추출
 
-    for sentence in sentences:                  # 개별 문장별로 작업
+    for sentence in sentences:                  # 개별 문장단위 작업
         morphemes = kkma.pos(sentence)          # 문장내에서 형태소를 품사와 함께 추출 ('단어', '품사')
         for word_set in morphemes:
             word = word_set[0]                  # 단어와 품사로 분리
@@ -33,7 +35,7 @@ def parse(file):
 def combine_lists(lists):
     combined_list = []                          # 결과 저장 리스트
     for list in lists:
-        combined_list.extend(list)              # 리스트 안의 리스트를 하나의 리스트로 합쳐줌
+        combined_list.extend(list)              # 각 프러세스별로 분리되어있던 리스트를 하나의 리스트로 합쳐줌
 
     return combined_list                        # 합쳐진 단일 리스트 반환
 
@@ -69,9 +71,9 @@ if __name__ == "__main__":
     pools.close()
     pools.join()
 
-    word_list = combine_lists(results)              # 받아온 결과 리스트를 원하는 형태로 재배치
+    word_list = combine_lists(results)              # 비동기 작업의 결과물을 원하는 형태로 재배치
 
-    top_words = sorted(                             # 단어를 빈도순으로 정렬하여 상위 n개로 줄이고, 출현횟수를 적어줌
+    top_words = sorted(                             # 단어 갯수를 세고 상위 n개의 단어만 남긴 뒤 갯수 기준으로 정렬함
         dict(Counter(word_list).most_common(word_count)).items(),
         key=operator.itemgetter(1)
     )

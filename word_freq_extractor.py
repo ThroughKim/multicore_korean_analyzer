@@ -1,51 +1,53 @@
+# 전체 텍스트에서 지정한 단어셋에 포함되어 있는 단어를 추출하고, 조건에 맞는 단어는 병합 하여 빈도수 출력
+
 from __future__ import division
-import time, os,  operator
 from multiprocessing import Pool
 from konlpy.tag import Kkma
 from collections import Counter
+import time
+import os
+import operator
 import sys
 
 
 def parse(file):
     result_list = []
-    kkma = Kkma()
-    file = open(folder_name + '/' + file)
-    file_text = file.read()
-    sentences = kkma.sentences(file_text)
+    kkma = Kkma()                                       # Konlpy의 꼬꼬마 형태소 분석기 사용
+    file = open(folder_name + '/' + file)               # 인자로 전달받은 파일 열기
+    file_text = file.read()                             # 파일의 텍스트를 읽어옴
+    sentences = kkma.sentences(file_text)               # 형태소 분석기로 텍스트의 각 Row의 문장을 리스트로 추출
 
-    for sentence in sentences:
-        morphemes = kkma.pos(sentence)
+    for sentence in sentences:                          # 개별 문장 단위로 작업
+        morphemes = kkma.pos(sentence)                  # 문장 내의 형태소를 품사와 함께 추출 (단어, 품사)
         for word_set in morphemes:
-            word = word_set[0]
+            word = word_set[0]                          # 단어와 품사로 분리
             type = word_set[1]
-            if type in tag_list:
-                if word in word_list:
+            if type in tag_list:                        # 지정한 품사만 추출
+                if word in word_list:                   # 지정한 단어만 추출
 
-                    if type == 'VV' or type == 'VA':
+                    if type == 'VV' or type == 'VA':    # 동사의 경우 뒤에 '다'를 붙여줌
                         word += '다'
-                    result_list.append(word)
 
-    return result_list
+                    word = replace_list.get(word, word) # 특정 조건에 해당하는 단어의 경우 치환해줌
+                    result_list.append(word)            # 결과 리스트에 더함
+
+    return result_list                                  # 결과 리스트 반환
 
 def combine_lists(lists):
-    replace_list = get_replace_list(word_set_type)
-
-    combined_list = []
+    combined_list = []                                  # 결과를 저장할 리스트
     for list in lists:
-        combined_list.extend(list)
+        combined_list.extend(list)                      # 각 프로세스별 분산되어있던 리스트를 하나의 리스트로 통합
 
-    combined_list = [str(replace_list.get(word, word)) for word in combined_list]
+    return combined_list                                # 통합된 리스트를 반환
 
-    return combined_list
-
-def make_log_result(results, len_file_list):
+def make_log_result(results, len_file_list):            # 현재 진행상황을 터미널에 출력해주는 함수
     def log_result(retval):
         results.append(retval)
         sys.stdout.write(" " + str(round(len(results)/len_file_list*100, 2)) + '% \r')
 
     return log_result
 
-def get_word_list(type):
+def get_word_list(type):                                # 사용자가 선택한 단어 세트를 반환해주는 함수
     word_list = []
 
     if type == "total":
@@ -77,12 +79,12 @@ def get_word_list(type):
 
     return word_list
 
-def get_tag_list():
+def get_tag_list():                                     # 추출할 품사를 지정하는 리스트를 반환하는 함수
     tag_list = ['NNG', 'NNP', 'VV', 'VA', 'MAG']
 
     return tag_list
 
-def get_replace_list(type):
+def get_replace_list(type):                             # 사용자가 선택한 단어 세트에 대한 단어 치환 리스트 반환
     replace_list = []
 
     if type == "total":
@@ -186,37 +188,45 @@ def get_replace_list(type):
     return replace_list
 
 if __name__ == "__main__":
+
     start_time = time.time()
-    tag_list = get_tag_list()
-    word_set_list = ['total', 'top', 'low']
-    word_count = 100
+    tag_list = get_tag_list()                           # 추출할 단어의 품사를 지정
+    word_set_list = ['total', 'top', 'low']             # [전체, 상, 하] 세 종류의 단어 세트 지정
 
     word_set_type = input("어떤 단어 세트를 사용하시겠습니까? [total, top, low] : ")
-    if word_set_type not in word_set_list:
+    if word_set_type not in word_set_list:              # 지정되지 않은 단어세트 예외 처리
         print("유효하지 않은 답변입니다.")
         exit()
-    word_list = get_word_list(word_set_type)
+    word_list = get_word_list(word_set_type)            # 사용자가 지정한 단어 세트 로드
+    replace_list = get_replace_list(word_set_type)      # 단어 세트에 해당하는 단어 대치 리스트 로드
 
     print("분석할 폴더의 이름을 입력하세요.")
     print("현재 파일에 대한 상대경로만 입력하면 되며, 끝에 '/'는 생략해주세요.")
     folder_name = input("폴더이름을 입력하세요:  ")
-    file_list = os.listdir(folder_name + '/')
+    file_list = os.listdir(folder_name + '/')           # 분석할 텍스트 파일이 있는 폴더 지정
 
-    pools = Pool(3)
+    pools = Pool(3)                                     # 분석 프로세스를 진행할 코어의 갯수 지정
     results = []
 
     for file in file_list:
-        pools.apply_async(parse, args=[file], callback=make_log_result(results, len(file_list)))
+        pools.apply_async(                              # 폴더 내 개별 파일에 대해 비동기로 작업 진행
+            parse,                                      # 파싱 함수 사용
+            args=[file],                                # 인자로 개별 파일명을 넘겨줌
+            callback=make_log_result(results, len(file_list))   # 콜백 메소드를 활용해 진행율을 표시해준다
+        )
     pools.close()
     pools.join()
 
-    word_list = combine_lists(results)
+    word_list = combine_lists(results)                  # 비동기 작업의 결과물을 원하는 형태로 재배치
 
-    top_words = sorted(dict(Counter(word_list).most_common(word_count)).items(), key=operator.itemgetter(1))
+    result_words = sorted(                              # 단어 갯수를 세고 갯수 기준으로 정렬함
+        dict(Counter(word_list)).items(),
+        key=operator.itemgetter(1)
+    )
 
-    f = open(folder_name + "_freq", 'w')
-    for word in reversed(top_words):
-        data = word[0] + " " + str(word[1])
+    f = open(folder_name + "_freq", 'w')                # 결과값을 저장할 파일을 지정
+    for word in reversed(result_words):
+        data = word[0] + " " + str(word[1])             # 파일에 단어와 갯수를 각각 기록
         f.write(data + "\n")
     f.close()
 

@@ -31,7 +31,7 @@ Pima.hat <- predict(Pima.lda)
 tabtrain <- table(Pima.tr$type, Pima.hat$class)
 
 
-text_data = readLines("total_output", encoding="UTF-8") ## 텍스트 파일의 모든 행 읽어오기
+text_data = readLines("total_lda_wordset", encoding="UTF-8") ## 텍스트 파일의 모든 행 읽어오기
 reviews<-text_data
 data<-reviews
 
